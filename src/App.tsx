@@ -44,7 +44,7 @@ function App() {
     <div className="app-shell">
       <header className="app-header">
         <div className="titles">
-          <span className="eyebrow">Cardio Fitness</span>
+          <span className="eyebrow">Training</span>
           <h1>VO2 Max</h1>
         </div>
         <button className="icon-button" onClick={() => setShowSettings(true)} aria-label="Settings">
@@ -81,8 +81,9 @@ function App() {
         <SessionHistory sessions={data.sessions} onToggle={handleToggleSession} />
       </div>
 
-      <button className="fab" onClick={() => setShowAddReading(true)} aria-label="Log VO2max reading">
-        <PlusIcon />
+      <button className="fab" onClick={() => setShowAddReading(true)}>
+        <PlusIcon size={18} />
+        Log Reading
       </button>
 
       {showAddReading && (
