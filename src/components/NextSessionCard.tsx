@@ -34,18 +34,18 @@ export function NextSessionCard({ session, onComplete, onOpenPlan }: Props) {
     )
   }
 
-  const isInterval = session.kind === 'norwegian_4x4' || session.kind === 'vo2max_intervals'
+  const isHard = session.kind === 'vo2max_intervals' || session.kind === 'tempo_run'
 
   return (
     <div className="card next-session-card">
       <div className="next-session-top">
-        <div className="session-icon">{isInterval ? <FlameIcon /> : <RunIcon />}</div>
+        <div className="session-icon">{isHard ? <FlameIcon /> : <RunIcon />}</div>
         <div className="next-session-body">
-          <div className="next-session-when">{whenLabel(session.date)} · Next VO2max Session</div>
+          <div className="next-session-when">{whenLabel(session.date)} · Next Training Session</div>
           <div className="next-session-title">{session.title}</div>
           <div className="next-session-desc">{session.description}</div>
           <div className="next-session-meta">
-            {formatLong(session.date)} · {session.durationMin} min
+            {formatLong(session.date)} · {session.duration}
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { RawVo2Reading } from './healthExport'
 import { generatePlan } from './plan'
 import { makeSeedData } from './seed'
-import type { AppData, SessionKind, TrainingSession, UserSettings, Vo2MaxReading } from './types'
+import type { AppData, UserSettings, Vo2MaxReading } from './types'
 
 const STORAGE_KEY = 'vo2max_app_data_v1'
 
@@ -42,7 +42,9 @@ export function useAppData() {
   const updateSettings = useCallback((partial: Partial<UserSettings>) => {
     setData((prev) => {
       const settings = { ...prev.settings, ...partial }
-      const sessions = [...prev.sessions, ...generatePlan(settings, prev.sessions)]
+      const sessions = [...prev.sessions, ...generatePlan(settings.programStartDate, prev.sessions)].sort((a, b) =>
+        a.date.localeCompare(b.date),
+      )
       return { ...prev, settings, sessions }
     })
   }, [])
@@ -88,29 +90,6 @@ export function useAppData() {
     }))
   }, [])
 
-  const addExtraSession = useCallback((kind: SessionKind, date: string, title: string, description: string, durationMin: number) => {
-    setData((prev) => {
-      const session: TrainingSession = {
-        id: makeId('sess'),
-        date,
-        kind,
-        title,
-        description,
-        durationMin,
-        status: 'upcoming',
-      }
-      return { ...prev, sessions: [...prev.sessions, session].sort((a, b) => a.date.localeCompare(b.date)) }
-    })
-  }, [])
-
-  const ensurePlanFilled = useCallback(() => {
-    setData((prev) => {
-      const more = generatePlan(prev.settings, prev.sessions)
-      if (more.length === 0) return prev
-      return { ...prev, sessions: [...prev.sessions, ...more] }
-    })
-  }, [])
-
   const resetData = useCallback(() => {
     const seeded = makeSeedData()
     setData(seeded)
@@ -123,8 +102,6 @@ export function useAppData() {
     importVo2Readings,
     completeSession,
     uncompleteSession,
-    addExtraSession,
-    ensurePlanFilled,
     resetData,
   }
 }

@@ -33,7 +33,7 @@ export function SessionHistory({ sessions, onToggle }: Props) {
         </div>
         <div className="session-row-body">
           <div className="session-row-title">{s.title}</div>
-          <div className="session-row-sub">{SESSION_INFO[s.kind].short} · {s.durationMin} min</div>
+          <div className="session-row-sub">{SESSION_INFO[s.kind].short} · {s.duration}</div>
         </div>
         <div className="session-row-date">
           {formatWeekday(s.date)}

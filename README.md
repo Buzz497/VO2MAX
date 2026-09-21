@@ -1,23 +1,31 @@
 # VO2 Max
 
-An Apple Health-styled tracker for VO2max training: see your current fitness, watch it trend
-toward a goal, and follow a structured interval plan with a clear next session and checkmarks
-for completed workouts.
+A tracker for VO2max training: see your current fitness, watch it trend toward a goal, and
+follow a fixed 8-week periodized plan with a clear next session and checkmarks for completed
+workouts.
 
 ## Features
 
-- **Cardio Fitness card** — current VO2max with a progress ring toward your goal, matching
-  Apple Health's VO2max metric styling.
+- **Aerobic Capacity card** — current VO2max with a progress bar toward your goal.
 - **Trend chart** — VO2max over time with 1M/3M/6M/1Y/ALL range tabs, a goal line, and a hover
   tooltip.
 - **Next Session card** — the next scheduled training session front and center, with a
   one-tap "Mark Complete".
 - **Training Log** — upcoming and recent sessions with ticks: a green check for completed, an
-  amber ring for missed, and an empty ring for upcoming.
-- **Training plan** — generates a Norwegian 4×4 VO2max interval plan (2×/week, 4×4 min hard /
-  3 min easy) plus an optional weekly Zone 2 long run, editable in Settings.
-- Data is stored locally in the browser (`localStorage`); log readings and sessions manually
-  via the **+** button until a live data source is connected.
+  amber square for missed, and an empty square for upcoming.
+- **Training plan** — a fixed 8-week program (`src/lib/plan.ts`), four two-week phases run
+  Monday/Tuesday/Thursday/Saturday:
+  - **Monday — VO2 Max Intervals**: pace and rep count progress each phase, from 4×4 min up to
+    5×5 min, 5:00–5:30/km down to 4:50–5:15/km.
+  - **Tuesday — Easy Recovery Run**: 20–25 min, 6:30–7:00/km, conversational throughout.
+  - **Thursday — Tempo Run**: comfortably-hard continuous intervals, progressing from 2×8 min
+    at 5:45/km to 2×9 min at 5:35/km.
+  - **Saturday — Long Outdoor Run**: 45–65 min steady effort, GPS tracked.
+
+  The program's start date (which Monday is week 1) and your baseline/goal VO2max are editable
+  in Settings.
+- Data is stored locally in the browser (`localStorage`); log readings manually via the **+**
+  button until a live data source is connected.
 
 ## Data sources
 

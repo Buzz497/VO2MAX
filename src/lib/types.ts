@@ -7,7 +7,7 @@ export interface Vo2MaxReading {
   source: ReadingSource
 }
 
-export type SessionKind = 'norwegian_4x4' | 'vo2max_intervals' | 'zone2_long' | 'easy_run'
+export type SessionKind = 'vo2max_intervals' | 'tempo_run' | 'easy_run' | 'long_run'
 
 export type SessionStatus = 'upcoming' | 'completed' | 'missed'
 
@@ -17,22 +17,17 @@ export interface TrainingSession {
   kind: SessionKind
   title: string
   description: string
-  durationMin: number
+  duration: string // display label, e.g. "25–30 min"
   status: SessionStatus
   completedDate?: string
   completedNote?: string
 }
 
 export interface UserSettings {
-  name: string
-  sex: 'male' | 'female' | 'unspecified'
-  age: number | null
   baselineVo2Max: number
   goalVo2Max: number
   goalDate: string // ISO date
-  sessionsPerWeek: number // interval sessions per week (1 or 2)
-  includeLongEasyRun: boolean
-  planStartDate: string // ISO date
+  programStartDate: string // ISO date — Monday the 8-week program begins
 }
 
 export interface AppData {

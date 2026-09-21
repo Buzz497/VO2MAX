@@ -14,18 +14,14 @@ export function SettingsSheet({ settings, onClose, onSave, onReset, onOpenImport
   const [baseline, setBaseline] = useState(String(settings.baselineVo2Max))
   const [goal, setGoal] = useState(String(settings.goalVo2Max))
   const [goalDate, setGoalDate] = useState(settings.goalDate)
-  const [age, setAge] = useState(settings.age ? String(settings.age) : '')
-  const [sessionsPerWeek, setSessionsPerWeek] = useState(settings.sessionsPerWeek)
-  const [includeLongEasyRun, setIncludeLongEasyRun] = useState(settings.includeLongEasyRun)
+  const [programStartDate, setProgramStartDate] = useState(settings.programStartDate)
 
   function submit() {
     onSave({
       baselineVo2Max: parseFloat(baseline) || settings.baselineVo2Max,
       goalVo2Max: parseFloat(goal) || settings.goalVo2Max,
       goalDate,
-      age: age ? parseInt(age, 10) : null,
-      sessionsPerWeek,
-      includeLongEasyRun,
+      programStartDate,
     })
     onClose()
   }
@@ -62,29 +58,11 @@ export function SettingsSheet({ settings, onClose, onSave, onReset, onOpenImport
       </div>
 
       <div className="field">
-        <label>Age (optional — used for heart-rate zones)</label>
-        <input type="number" placeholder="e.g. 34" value={age} onChange={(e) => setAge(e.target.value)} />
-      </div>
-
-      <div className="field">
-        <label>Interval sessions per week</label>
-        <div className="segmented">
-          <button className={sessionsPerWeek === 1 ? 'active' : ''} onClick={() => setSessionsPerWeek(1)}>
-            1× / week
-          </button>
-          <button className={sessionsPerWeek === 2 ? 'active' : ''} onClick={() => setSessionsPerWeek(2)}>
-            2× / week
-          </button>
-        </div>
-      </div>
-
-      <div className="toggle-row">
-        <span className="label">Include weekly long easy run</span>
+        <label>8-week program start (Monday of week 1)</label>
         <input
-          type="checkbox"
-          checked={includeLongEasyRun}
-          onChange={(e) => setIncludeLongEasyRun(e.target.checked)}
-          style={{ width: 20, height: 20 }}
+          type="date"
+          value={programStartDate}
+          onChange={(e) => setProgramStartDate(e.target.value)}
         />
       </div>
 

@@ -1,42 +1,69 @@
-import type { SessionKind, TrainingSession, UserSettings } from './types'
-import { addDays, addWeeks, daysBetween, nextWeekday, todayISO } from './date'
+import type { SessionKind, TrainingSession } from './types'
+import { addDays, daysBetween, nextWeekday } from './date'
 
 export const SESSION_INFO: Record<SessionKind, { label: string; short: string }> = {
-  norwegian_4x4: { label: 'Norwegian 4×4 Intervals', short: '4×4' },
-  vo2max_intervals: { label: 'VO2max Intervals', short: 'Intervals' },
-  zone2_long: { label: 'Zone 2 Long Run', short: 'Long run' },
+  vo2max_intervals: { label: 'VO2 Max Intervals', short: 'Intervals' },
+  tempo_run: { label: 'Tempo Run', short: 'Tempo' },
   easy_run: { label: 'Easy Recovery Run', short: 'Easy' },
+  long_run: { label: 'Long Outdoor Run', short: 'Long run' },
 }
 
-function hrZoneText(settings: UserSettings, lowPct: number, highPct: number): string {
-  if (!settings.age) return `${lowPct}–${highPct}% of max heart rate`
-  const hrMax = 220 - settings.age
-  return `${Math.round((hrMax * lowPct) / 100)}–${Math.round((hrMax * highPct) / 100)} bpm (${lowPct}–${highPct}% HRmax)`
+interface SessionTemplate {
+  /** Days after that week's Monday: Mon=0, Tue=1, ... Sun=6 */
+  dayOffset: number
+  kind: SessionKind
+  duration: string
+  pace: string
+  setsReps: string
+  notes: string
 }
 
-function norwegian4x4Session(id: string, date: string, settings: UserSettings): TrainingSession {
-  return {
-    id,
-    date,
-    kind: 'norwegian_4x4',
-    title: 'Norwegian 4×4 Intervals',
-    description: `10 min warm-up, then 4 × 4 min hard at ${hrZoneText(settings, 85, 95)}, with 3 min easy recovery at ${hrZoneText(settings, 60, 70)} between reps. 5–10 min cool-down. ~38 min total.`,
-    durationMin: 38,
-    status: 'upcoming',
-  }
+interface PhaseTemplate {
+  /** Program week numbers this phase covers, 1-indexed (e.g. [1, 2]) */
+  weeks: [number, number]
+  sessions: SessionTemplate[]
 }
 
-function zone2Session(id: string, date: string, settings: UserSettings): TrainingSession {
-  return {
-    id,
-    date,
-    kind: 'zone2_long',
-    title: 'Zone 2 Long Run',
-    description: `Steady aerobic effort at ${hrZoneText(settings, 60, 75)}. Builds the aerobic base that supports VO2max gains. 45–60 min, conversational pace.`,
-    durationMin: 50,
-    status: 'upcoming',
-  }
-}
+// The user's 8-week periodized plan: 4 two-week phases, each with the same
+// weekly rhythm (Mon/Tue/Thu/Sat) but progressing duration, pace and volume.
+const PROGRAM: PhaseTemplate[] = [
+  {
+    weeks: [1, 2],
+    sessions: [
+      { dayOffset: 0, kind: 'vo2max_intervals', duration: '25–30 min', pace: '5:00–5:30/km', setsReps: '4×4 min + 2 min recovery', notes: 'Hard effort, 8.5/10' },
+      { dayOffset: 1, kind: 'easy_run', duration: '20–25 min', pace: '6:30–7:00/km', setsReps: 'Continuous', notes: 'Conversational pace' },
+      { dayOffset: 3, kind: 'tempo_run', duration: '28–30 min', pace: '5:45/km', setsReps: '2×8 min + 2 min recovery', notes: 'Comfortably hard, 7.5/10' },
+      { dayOffset: 5, kind: 'long_run', duration: '45–60 min', pace: '6:30/km', setsReps: 'Continuous', notes: 'GPS required, steady effort' },
+    ],
+  },
+  {
+    weeks: [3, 4],
+    sessions: [
+      { dayOffset: 0, kind: 'vo2max_intervals', duration: '28–32 min', pace: '5:00–5:30/km', setsReps: '5×4 min + 2 min recovery', notes: '+1 rep from weeks 1-2' },
+      { dayOffset: 1, kind: 'easy_run', duration: '20–25 min', pace: '6:30–7:00/km', setsReps: 'Continuous', notes: 'Keep easy' },
+      { dayOffset: 3, kind: 'tempo_run', duration: '28–30 min', pace: '5:45/km', setsReps: '2×8 min + 2 min recovery', notes: 'Same pace, focus on form' },
+      { dayOffset: 5, kind: 'long_run', duration: '50–65 min', pace: '6:30/km', setsReps: 'Continuous', notes: 'Steady, GPS data' },
+    ],
+  },
+  {
+    weeks: [5, 6],
+    sessions: [
+      { dayOffset: 0, kind: 'vo2max_intervals', duration: '25–30 min', pace: '4:50–5:15/km', setsReps: '4×5 min + 2 min recovery', notes: 'Faster pace, longer duration' },
+      { dayOffset: 1, kind: 'easy_run', duration: '20–25 min', pace: '6:30–7:00/km', setsReps: 'Continuous', notes: 'Stay comfortable' },
+      { dayOffset: 3, kind: 'tempo_run', duration: '30–32 min', pace: '5:35/km', setsReps: '2×9 min + 2 min recovery', notes: 'Slightly longer, faster' },
+      { dayOffset: 5, kind: 'long_run', duration: '50–65 min', pace: '6:30/km', setsReps: 'Continuous', notes: 'Outdoor, steady' },
+    ],
+  },
+  {
+    weeks: [7, 8],
+    sessions: [
+      { dayOffset: 0, kind: 'vo2max_intervals', duration: '30–35 min', pace: '4:50–5:15/km', setsReps: '5×5 min + 2 min recovery', notes: 'Peak intensity, +1 rep' },
+      { dayOffset: 1, kind: 'easy_run', duration: '20–25 min', pace: '6:30–7:00/km', setsReps: 'Continuous', notes: 'Active recovery' },
+      { dayOffset: 3, kind: 'tempo_run', duration: '30–32 min', pace: '5:35/km', setsReps: '2×9 min + 2 min recovery', notes: 'Maintain intensity' },
+      { dayOffset: 5, kind: 'long_run', duration: '45–60 min', pace: '6:30/km', setsReps: 'Continuous', notes: 'Consolidate gains' },
+    ],
+  },
+]
 
 let counter = 0
 function nextId(prefix: string): string {
@@ -44,43 +71,57 @@ function nextId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${counter}`
 }
 
+function describeSession(t: SessionTemplate): string {
+  return `${t.pace} · ${t.setsReps}. ${t.notes}.`
+}
+
 /**
- * Generates upcoming sessions on a fixed weekly rhythm (Tue/Fri intervals, Sun long run)
- * from today through the goal date (capped at 16 weeks out), skipping any date that
- * already has a session.
+ * Builds every session of the fixed 8-week program, anchored so program week 1
+ * starts on the Monday on/after `startDate`.
  */
-export function generatePlan(settings: UserSettings, existing: TrainingSession[]): TrainingSession[] {
+export function generateProgram(startDate: string): TrainingSession[] {
+  const week1Monday = nextWeekday(startDate, 1) // 1 = Monday
+  const sessions: TrainingSession[] = []
+
+  for (const phase of PROGRAM) {
+    for (const week of [phase.weeks[0], phase.weeks[1]]) {
+      const weekMonday = addDays(week1Monday, (week - 1) * 7)
+      for (const t of phase.sessions) {
+        const date = addDays(weekMonday, t.dayOffset)
+        sessions.push({
+          id: nextId('sess'),
+          date,
+          kind: t.kind,
+          title: SESSION_INFO[t.kind].label,
+          description: describeSession(t),
+          duration: t.duration,
+          status: 'upcoming',
+        })
+      }
+    }
+  }
+
+  return sessions.sort((a, b) => a.date.localeCompare(b.date))
+}
+
+/**
+ * Fills in any program sessions not already present (by date), so calling this
+ * after a settings change never duplicates existing entries.
+ */
+export function generatePlan(programStartDate: string, existing: TrainingSession[]): TrainingSession[] {
   const existingDates = new Set(existing.map((s) => s.date))
-  const start = todayISO()
-  const cappedEnd = addWeeks(start, 16)
-  const end = daysBetween(start, settings.goalDate) > 0 && daysBetween(settings.goalDate, cappedEnd) > 0
-    ? settings.goalDate
-    : cappedEnd
+  return generateProgram(programStartDate).filter((s) => {
+    if (existingDates.has(s.date)) return false
+    existingDates.add(s.date)
+    return true
+  })
+}
 
-  const intervalWeekdays = settings.sessionsPerWeek >= 2 ? [2, 5] : [2] // Tue, Fri
-  const generated: TrainingSession[] = []
+export function programEndDate(programStartDate: string): string {
+  const week1Monday = nextWeekday(programStartDate, 1)
+  return addDays(week1Monday, 8 * 7 - 1)
+}
 
-  for (const weekday of intervalWeekdays) {
-    let d = nextWeekday(start, weekday)
-    while (daysBetween(d, end) >= 0) {
-      if (!existingDates.has(d)) {
-        generated.push(norwegian4x4Session(nextId('sess'), d, settings))
-        existingDates.add(d)
-      }
-      d = addDays(d, 7)
-    }
-  }
-
-  if (settings.includeLongEasyRun) {
-    let d = nextWeekday(start, 0) // Sunday
-    while (daysBetween(d, end) >= 0) {
-      if (!existingDates.has(d)) {
-        generated.push(zone2Session(nextId('sess'), d, settings))
-        existingDates.add(d)
-      }
-      d = addDays(d, 7)
-    }
-  }
-
-  return generated.sort((a, b) => a.date.localeCompare(b.date))
+export function daysUntilProgramEnd(programStartDate: string, todayISO: string): number {
+  return daysBetween(todayISO, programEndDate(programStartDate))
 }
