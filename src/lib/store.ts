@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import type { RawVo2Reading } from './healthExport'
 import { generatePlan } from './plan'
 import { makeSeedData } from './seed'
 import type { AppData, SessionKind, TrainingSession, UserSettings, Vo2MaxReading } from './types'
@@ -54,6 +55,21 @@ export function useAppData() {
     })
   }, [])
 
+  const importVo2Readings = useCallback((imported: RawVo2Reading[]) => {
+    setData((prev) => {
+      const importedDates = new Set(imported.map((r) => r.date))
+      const kept = prev.readings.filter((r) => !importedDates.has(r.date))
+      const newOnes: Vo2MaxReading[] = imported.map((r) => ({
+        id: makeId('read'),
+        date: r.date,
+        value: r.value,
+        source: 'apple_health',
+      }))
+      const readings = [...kept, ...newOnes].sort((a, b) => a.date.localeCompare(b.date))
+      return { ...prev, readings }
+    })
+  }, [])
+
   const completeSession = useCallback((sessionId: string, completedDate: string) => {
     setData((prev) => ({
       ...prev,
@@ -104,6 +120,7 @@ export function useAppData() {
     data,
     updateSettings,
     addReading,
+    importVo2Readings,
     completeSession,
     uncompleteSession,
     addExtraSession,

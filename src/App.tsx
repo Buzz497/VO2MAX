@@ -3,6 +3,7 @@ import './App.css'
 import { AddReadingSheet } from './components/AddReadingSheet'
 import { HeroCard } from './components/HeroCard'
 import { GearIcon, PlusIcon } from './components/Icons'
+import { ImportHealthSheet } from './components/ImportHealthSheet'
 import { NextSessionCard } from './components/NextSessionCard'
 import { SessionHistory } from './components/SessionHistory'
 import { SettingsSheet } from './components/SettingsSheet'
@@ -15,10 +16,12 @@ import type { TrainingSession } from './lib/types'
 const RANGES: ChartRange[] = ['1M', '3M', '6M', '1Y', 'ALL']
 
 function App() {
-  const { data, updateSettings, addReading, completeSession, uncompleteSession, resetData } = useAppData()
+  const { data, updateSettings, addReading, importVo2Readings, completeSession, uncompleteSession, resetData } =
+    useAppData()
   const [range, setRange] = useState<ChartRange>('3M')
   const [showAddReading, setShowAddReading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showImport, setShowImport] = useState(false)
 
   const nextSession = useMemo(() => {
     const today = todayISO()
@@ -60,6 +63,9 @@ function App() {
       <div className="card">
         <div className="card-title-row">
           <span className="card-title">Trend</span>
+          <button className="card-link" onClick={() => setShowImport(true)}>
+            Import from Health
+          </button>
         </div>
         <div className="range-tabs">
           {RANGES.map((r) => (
@@ -83,12 +89,20 @@ function App() {
         <AddReadingSheet onClose={() => setShowAddReading(false)} onAdd={addReading} />
       )}
 
+      {showImport && (
+        <ImportHealthSheet onClose={() => setShowImport(false)} onImport={importVo2Readings} />
+      )}
+
       {showSettings && (
         <SettingsSheet
           settings={data.settings}
           onClose={() => setShowSettings(false)}
           onSave={updateSettings}
           onReset={resetData}
+          onOpenImport={() => {
+            setShowSettings(false)
+            setShowImport(true)
+          }}
         />
       )}
     </div>

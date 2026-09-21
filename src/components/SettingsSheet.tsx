@@ -7,9 +7,10 @@ interface Props {
   onClose: () => void
   onSave: (partial: Partial<UserSettings>) => void
   onReset: () => void
+  onOpenImport: () => void
 }
 
-export function SettingsSheet({ settings, onClose, onSave, onReset }: Props) {
+export function SettingsSheet({ settings, onClose, onSave, onReset, onOpenImport }: Props) {
   const [baseline, setBaseline] = useState(String(settings.baselineVo2Max))
   const [goal, setGoal] = useState(String(settings.goalVo2Max))
   const [goalDate, setGoalDate] = useState(settings.goalDate)
@@ -32,13 +33,17 @@ export function SettingsSheet({ settings, onClose, onSave, onReset }: Props) {
   return (
     <Sheet title="Training Settings" onClose={submit}>
       <div className="banner">
-        <span style={{ fontSize: 20 }}>🔗</span>
+        <span style={{ fontSize: 20 }}>🍎</span>
         <div className="banner-text">
-          <b>Strava not fully connected</b>
-          Finish connecting Strava in your Claude connector settings to sync real runs and VO2max
-          estimates. Until then, log readings and sessions manually below.
+          <b>Get your real VO2max readings</b>
+          There's no live cloud API for Apple Health, but you can export your data from the iPhone
+          Health app and import it here — the most accurate source, since Strava doesn't reliably
+          report a true VO2max.
         </div>
       </div>
+      <button className="btn-secondary" onClick={onOpenImport} style={{ marginBottom: 16 }}>
+        Import Apple Health Export
+      </button>
 
       <div className="field-row">
         <div className="field">

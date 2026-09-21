@@ -59,6 +59,11 @@ export function HeroCard({ readings, settings }: Props) {
         <div className="hero-goal">
           Baseline {settings.baselineVo2Max} → Goal {settings.goalVo2Max} mL/kg/min
         </div>
+        {latest?.source === 'apple_health' && (
+          <div className="hero-goal" style={{ color: 'var(--text-tertiary)' }}>
+            🍎 via Apple Health
+          </div>
+        )}
       </div>
     </div>
   )
