@@ -69,6 +69,16 @@ Output shape:
 }
 ```
 
+## Deployment
+
+Pushes to `claude/vo2-max-tracking-app-qhpjum` build and deploy to GitHub Pages automatically
+via `.github/workflows/deploy-pages.yml`. One-time setup in the repo (already done if you're
+reading this after that step): **Settings → Pages → Source: GitHub Actions**. After that, the
+live URL is `https://<your-github-username>.github.io/VO2MAX/` and updates on every push.
+
+Data still lives in each visitor's own browser (`localStorage`) — Pages only hosts the static
+files, there's no server or shared database.
+
 ## Development
 
 ```bash
